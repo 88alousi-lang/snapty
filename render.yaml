@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: snapty
+    runtime: node
+    region: oregon
+    plan: free
+    buildCommand: pnpm install --include=dev && pnpm build
+    startCommand: pnpm start
+    healthCheckPath: /api/trpc/system.health?input=%7B%22json%22%3A%7B%22timestamp%22%3A0%7D%7D
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ENCRYPTION_KEY
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: OAUTH_SERVER_URL
+        sync: false
+      - key: VITE_APP_ID
+        sync: false
+      - key: OWNER_OPEN_ID
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: APP_URL
+        sync: false

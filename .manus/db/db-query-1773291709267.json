@@ -1,0 +1,9 @@
+{
+  "query": "SELECT id, bookingCode, clientId, photographerId, status FROM bookings LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 7g85S9AmCJT5C2V.cd366294e46d --database hRDTnoMUg9RrhxuCxnRSRa --execute SELECT id, bookingCode, clientId, photographerId, status FROM bookings LIMIT 10;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 486
+}

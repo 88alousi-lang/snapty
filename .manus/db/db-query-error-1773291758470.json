@@ -1,0 +1,8 @@
+{
+  "query": "INSERT INTO bookings (clientId, photographerId, propertyAddress, propertyType, propertySize, bedrooms, bathrooms, selectedServices, scheduledDate, scheduledTime, basePrice, addOnPrice, totalPrice, bookingCode, status, paymentStatus, createdAt, updatedAt) VALUES (1, NULL, '123 Main St, Austin, TX', 'house', 2000, 3, 2, 'standard_photos,drone_photos', '2026-03-15', '10:00', 250.00, 50.00, 300.00, 'TEST123', 'completed', 'completed', NOW(), NOW());",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 7g85S9AmCJT5C2V.cd366294e46d --database hRDTnoMUg9RrhxuCxnRSRa --execute INSERT INTO bookings (clientId, photographerId, propertyAddress, propertyType, propertySize, bedrooms, bathrooms, selectedServices, scheduledDate, scheduledTime, basePrice, addOnPrice, totalPrice, bookingCode, status, paymentStatus, createdAt, updatedAt) VALUES (1, NULL, '123 Main St, Austin, TX', 'house', 2000, 3, 2, 'standard_photos,drone_photos', '2026-03-15', '10:00', 250.00, 50.00, 300.00, 'TEST123', 'completed', 'completed', NOW(), NOW());",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'bedrooms' in 'field list'"
+  ]
+}

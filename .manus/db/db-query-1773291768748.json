@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO bookings (bookingCode, clientId, photographerId, propertyAddress, propertyType, propertySize, specialInstructions, basePrice, addOnPrice, totalPrice, scheduledDate, duration, status, paymentStatus, createdAt, updatedAt) VALUES ('TEST123', 1, NULL, '123 Main St, Austin, TX', 'house', 2000, 'Test booking', 250.00, 50.00, 300.00, '2026-03-15 10:00:00', 120, 'delivered', 'completed', NOW(), NOW());",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 7g85S9AmCJT5C2V.cd366294e46d --database hRDTnoMUg9RrhxuCxnRSRa --execute INSERT INTO bookings (bookingCode, clientId, photographerId, propertyAddress, propertyType, propertySize, specialInstructions, basePrice, addOnPrice, totalPrice, scheduledDate, duration, status, paymentStatus, createdAt, updatedAt) VALUES ('TEST123', 1, NULL, '123 Main St, Austin, TX', 'house', 2000, 'Test booking', 250.00, 50.00, 300.00, '2026-03-15 10:00:00', 120, 'delivered', 'completed', NOW(), NOW());",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 367
+}

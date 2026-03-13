@@ -1,0 +1,126 @@
+deletePhoto: protectedProcedure
+      .input(z.object({ photoId: z.number(), bookingId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+        const booking = await getBookingById(input.bookingId);
+        if (!booking) throw new TRPCError({ code: "NOT_FOUND" });
+        if (booking.photographerId !== ctx.user.id && ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+
+        if (["delivered", "completed"].includes(booking.status)) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Cannot delete photos after delivery" });
+        }
+
+        await deleteBookingPhoto(input.photoId);
+        return { success: true };
+      }),
+
+    reorderPhotos: protectedProcedure
+      .input(z.object({ bookingId: z.number(), photoIds: z.array(z.number()) }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+        const booking = await getBookingById(input.bookingId);
+        if (!booking) throw new TRPCError({ code: "NOT_FOUND" });
+        if (booking.photographerId !== ctx.user.id && ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+
+        if (["delivered", "completed"].includes(booking.status)) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Cannot reorder photos after delivery" });
+        }
+
+        await reorderBookingPhotos(input.bookingId, input.photoIds);
+        return { success: true };
+      }),
+
+    markAsDelivered: protectedProcedure
+      .input(z.object({ bookingId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+        const booking = await getBookingById(input.bookingId);
+        if (!booking) throw new TRPCError({ code: "NOT_FOUND" });
+        if (booking.photographerId !== ctx.user.id && ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+
+        if (booking.status !== "photos_uploaded") {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Photos must be uploaded before delivery" });
+        }
+
+        await db.update(bookings).set({
+          status: "delivered",
+          updatedAt: new Date(),
+        }).where(eq(bookings.id, input.bookingId));
+
+        return { success: true };
+      }),
+
+    confirmDelivery: protectedProcedure
+      .input(z.object({ bookingId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+        const booking = await getBookingById(input.bookingId);
+        if (!booking) throw new TRPCError({ code: "NOT_FOUND" });
+        if (booking.clientId !== ctx.user.id && ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+
+        if (booking.status !== "delivered") {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Booking must be delivered before confirmation" });
+        }
+
+        await db.update(bookings).set({
+          status: "completed",
+          updatedAt: new Date(),
+        }).where(eq(bookings.id, input.bookingId));
+
+        return { success: true };
+      }),
+
+    getSignedPhotoUrl: protectedProcedure
+      .input(z.object({ photoId: z.number(), bookingId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+        const booking = await getBookingById(input.bookingId);
+        if (!booking) throw new TRPCError({ code: "NOT_FOUND" });
+        if (booking.photographerId !== ctx.user.id && booking.clientId !== ctx.user.id && ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+
+        const photos = await getBookingPhotos(input.bookingId);
+        const photo = photos.find(p => p.id === input.photoId);
+        if (!photo) throw new TRPCError({ code: "NOT_FOUND" });
+
+        return { url: photo.fileUrl, expiresIn: 86400 };
+      }),
+
+    createPhotoZip: protectedProcedure
+      .input(z.object({ bookingId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+        const booking = await getBookingById(input.bookingId);
+        if (!booking) throw new TRPCError({ code: "NOT_FOUND" });
+        if (booking.clientId !== ctx.user.id && ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+
+        const photos = await getBookingPhotos(input.bookingId);
+        if (photos.length === 0) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "No photos available to download" });
+        }
+
+        return { photos: photos.map(p => ({ id: p.id, fileName: p.fileName, fileUrl: p.fileUrl })), count: photos.length };
+      }),
