@@ -12,4 +12,10 @@ export default defineConfig({
   dbCredentials: {
     url: connectionString,
   },
+  casing: "snake_case",
 });
+
+// For TiDB Cloud, SSL is required
+if (connectionString && connectionString.includes('tidbcloud.com')) {
+  // SSL will be handled automatically by the MySQL driver
+}
